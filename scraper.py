@@ -271,8 +271,8 @@ if __name__ == "__main__":
     print(f"📧 Starting email sequence from {output_file}...")
     
     
-    if os.path.exists("testmail.csv"):
-        with open("testmail.csv", newline='', encoding='utf-8') as csvfile:
+    if os.path.exists(output_file):
+        with open(output_file, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 name = row['name']
