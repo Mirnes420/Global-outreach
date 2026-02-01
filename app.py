@@ -7,6 +7,14 @@ import subprocess
 import os
 import json
 
+try:
+    import playwright
+except ImportError:
+    subprocess.run(['pip', 'install', 'playwright'])
+
+# Force install the chromium binaries
+os.system("playwright install chromium")
+
 #-------------------------------------------------------------------------------#
 # SYSTEM CONFIG
 #-------------------------------------------------------------------------------#
