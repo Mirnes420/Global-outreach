@@ -1,9 +1,4 @@
 # --- Private Logic (The "Secret Sauce") ---
-app.py
-scraper.py
-database.py
-logic/
-utils/
 
 # --- Environment & Secrets ---
 .env
@@ -15,7 +10,6 @@ venv/
 # --- Data & Logs ---
 *.csv
 *.log
-leads_with_emails.csv
 testmail.csv
 
 # --- Python & System Junk ---
