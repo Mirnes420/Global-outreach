@@ -15,6 +15,8 @@ if sys.platform == 'win32':
 
 st.set_page_config(page_title="LeadGen Pro 2026", layout="wide")
 
+# The Master Whitelist
+ALLOWED_EMAILS = ["nmirnes32@gmail.com"]
 
 # This ensures the app doesn't show old leads from previous users/sessions
 if "logged_in" not in st.session_state:
@@ -23,33 +25,43 @@ if "logged_in" not in st.session_state:
         os.remove("leads_with_emails.csv")
 
 #-------------------------------------------------------------------------------#
-# SIDEBAR: CREDENTIALS & DEBUG
+# LOGIN SCREEN
 #-------------------------------------------------------------------------------#
-# --- LOGIN SCREEN ---
 if not st.session_state["logged_in"]:
     st.title("🔒 Outreach Login")
     with st.form("login_form"):
-        email = st.text_input("Gmail Address")
+        email = st.text_input("Gmail Address").lower().strip() # Normalize input
         app_password = st.text_input("Gmail App Password", type="password")
         sender_name = st.text_input("Your Name")
         company = st.text_input("Company Name")
         submit = st.form_submit_button("Enter Dashboard")
 
         if submit:
-            if email and app_password and sender_name:
-                # Store everything in session
+            # 1. Check if fields are filled
+            if not (email and app_password and sender_name):
+                st.error("Please fill in all required fields.")
+            
+            # 2. THE GATEKEEPER: Check if the email is on the whitelist
+            elif email not in ALLOWED_EMAILS:
+                st.error(f"🚫 Access Denied. {email} is not authorized to use this tool.")
+                st.info("Please contact the administrator for access.")
+            
+            # 3. Success - Set session state
+            else:
                 st.session_state["email_val"] = email
                 st.session_state["pass_val"] = app_password
                 st.session_state["name_val"] = sender_name
                 st.session_state["comp_val"] = company
                 st.session_state["logged_in"] = True
                 st.session_state["user_id"] = email
+                st.success("Access Granted! Loading dashboard...")
                 st.rerun()
-            else:
-                st.error("Please fill in all required fields.")
-    st.stop() # Prevents the rest of the app from loading
+                
+    st.stop() 
 
-# --- DASHBOARD (Only visible if logged_in is True) ---
+#-------------------------------------------------------------------------------#
+# DASHBOARD (Only visible if logged_in is True)
+#-------------------------------------------------------------------------------#
 st.sidebar.success(f"Logged in as: {st.session_state.name_val}")
 if st.sidebar.button("Logout & Wipe Data"):
     if os.path.exists("leads_with_emails.csv"):
