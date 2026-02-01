@@ -1,11 +1,25 @@
-.env
-testmail.csv
-.pytest_cache/
-__pycache__/
-*.pyc
-.venv/
-env/
-venv/
+# --- Private Logic (The "Secret Sauce") ---
 app.py
 scraper.py
 database.py
+logic/
+utils/
+
+# --- Environment & Secrets ---
+.env
+*.env
+env/
+venv/
+.venv/
+
+# --- Data & Logs ---
+*.csv
+*.log
+leads_with_emails.csv
+testmail.csv
+
+# --- Python & System Junk ---
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
