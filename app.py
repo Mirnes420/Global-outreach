@@ -113,7 +113,6 @@ Best regards,
 start_time = time.time()
 
 if st.button("🚀 Start Scraper & Outreach"):
-    
     if not st.session_state.email_val or not st.session_state.name_val:
         st.error("❌ Fill in the sidebar credentials!")
     else:
@@ -138,26 +137,29 @@ if st.button("🚀 Start Scraper & Outreach"):
 
         with st.spinner("Scraping and processing leads..."):
             try:
-                subprocess.run(cmd,text=True, stdout=None, stderr=None, check=True)
+                # 1. RUN THE SCRAPER
+                subprocess.run(cmd, text=True, stdout=None, stderr=None, check=True)
+                
+                # 2. THE FIX: Immediately load the results into Session State
+                if os.path.exists(output_file):
+                    df = pd.read_csv(output_file)
+                    st.session_state["leads_df"] = df  # Save to memory
+                    st.session_state["scrape_duration"] = time.time() - start_time
+                    st.success("✅ Leads loaded into session memory.")
+                
             except subprocess.CalledProcessError as e:
                 st.error("Backend Error")
                 st.code(e.stderr)
 
-
-# --- TIME TRACKING END ---
-end_time = time.time()
-duration = end_time - start_time
-
 #-------------------------------------------------------------------------------#
-# THE "MISSING" BLOCK: SHOW & EDIT EMAILS
+# THE "DISPLAY" BLOCK: PULLS FROM SESSION STATE
 #-------------------------------------------------------------------------------#
-output_file = "leads_with_emails.csv"
-
-if os.path.exists(output_file):
+if "leads_df" in st.session_state:
     st.divider()
     st.header("✅ Outreach Summary")
     
-    df = pd.read_csv(output_file)
+    df = st.session_state["leads_df"]
+    duration = st.session_state.get("scrape_duration", 0)
     
     if not df.empty:
         # Filter for valid emails
@@ -166,13 +168,19 @@ if os.path.exists(output_file):
         if not sent_df.empty:
             st.success(f"Successfully processed {len(sent_df)} emails in {duration:.2f} seconds.")
             
-            # Show ONLY the clean list of recipients
             st.subheader("📩 Recipient List")
             for index, row in sent_df.iterrows():
-                # Displaying each one in a clean, professional line
                 st.write(f"✔️ **{row['name']}** — *{row['email']}*")
                 
+            # --- PROFESSIONAL ADDITION: DOWNLOAD BUTTON ---
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Lead Report (CSV)",
+                data=csv,
+                file_name=f"Leads_{st.session_state.city_val}.csv",
+                mime="text/csv",
+            )
         else:
-            st.warning("No valid email addresses were found to send to.")
+            st.warning("No valid email addresses were found.")
     else:
         st.warning("No leads were generated.")
