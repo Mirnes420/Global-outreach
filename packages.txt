@@ -1,2 +1,5 @@
 chromium
 chromium-driver
+playwright
+libgbm1
+libasound2
