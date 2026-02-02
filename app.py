@@ -12,20 +12,11 @@ from fpdf.enums import XPos, YPos # Needed for new FPDF version
 #-------------------------------------------------------------------------------#
 # INSTALLATION & SYSTEM CONFIG
 #-------------------------------------------------------------------------------#
-def ensure_playwright():
-    marker_file = "playwright_installed.txt"
-    if not os.path.exists(marker_file):
-        with st.spinner("Setting up browser engine..."):
-            # We only install the chromium binary here
-            subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-            with open(marker_file, "w") as f: f.write("done")
-
-ensure_playwright()
-
-if not os.path.exists("playwright_installed.txt"):
-    os.system("playwright install chromium")
-    with open("playwright_installed.txt", "w") as f: f.write("done")
-
+if not os.path.exists("browser_ready.txt"):
+    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"])
+    with open("browser_ready.txt", "w") as f:
+        f.write("ready")
+        
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
