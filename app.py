@@ -12,10 +12,15 @@ from fpdf.enums import XPos, YPos # Needed for new FPDF version
 #-------------------------------------------------------------------------------#
 # INSTALLATION & SYSTEM CONFIG
 #-------------------------------------------------------------------------------#
-try:
-    import playwright
-except ImportError:
-    subprocess.run(['pip', 'install', 'playwright'])
+def ensure_playwright():
+    marker_file = "playwright_installed.txt"
+    if not os.path.exists(marker_file):
+        with st.spinner("Setting up browser engine..."):
+            # We only install the chromium binary here
+            subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+            with open(marker_file, "w") as f: f.write("done")
+
+ensure_playwright()
 
 if not os.path.exists("playwright_installed.txt"):
     os.system("playwright install chromium")
